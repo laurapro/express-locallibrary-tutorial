@@ -1,0 +1,136 @@
+<!-- addBabyName.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Baby Name</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/styles.css" />
+
+    <style>
+      label {
+        margin-bottom: 16px;
+        display: block;
+        color: #333;
+        font-size: 18px;
+      }
+
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        resize: vertical;
+        font-size: 16px;
+      }
+
+      .container {
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        padding: 24px;
+        max-width: 60%;
+        margin: 40px auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .button {
+        display: inline-block;
+        border-radius: 8px;
+        background-color: #66cdaa;
+        border: none;
+        color: #ffffff;
+        text-align: center;
+        font-size: 22px;
+        padding: 14px 20px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 10px 0;
+      }
+
+      .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+
+      .button span:after {
+        content: "\00bb";
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+
+      .button:hover span {
+        padding-right: 25px;
+      }
+
+      .button:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="index.html">Home</a>
+      <a class="active" href="addBabyName.html">Add New Name</a>
+      <a href="popularityList.html">Popularity List</a>
+    </div>
+
+    <div class="container">
+      <form id="addBabyNameForm">
+        <label for="fname">Name</label>
+        <input type="text" id="name" name="name" required />
+        <br />
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+          <option value="Boy">Boy</option>
+          <option value="Girl">Girl</option>
+          <option value="Neutral">Neutral</option>
+        </select>
+        <br />
+        <!-- <button type="submit">Add Baby Name</button> -->
+        <button type="submit" class="button" style="vertical-align: middle">
+          <span>Add Baby Name </span>
+        </button>
+      </form>
+    </div>
+
+    <script type="module" defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        const addBabyNameForm = document.getElementById("addBabyNameForm");
+
+        addBabyNameForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const gender = document.getElementById("gender").value;
+          const popularity = 0;
+
+          // Make a request to add the baby name to the server
+          await fetch("/addBabyName", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, gender, popularity }),
+          }).catch((error) => {
+            console.error("Error:", error);
+          });
+
+          // Redirect to the main page or perform any other action
+          window.location.href = "index.html";
+        });
+      });
+    </script>
+  </body>
+</html>

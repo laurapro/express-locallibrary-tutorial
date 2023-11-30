@@ -1,0 +1,101 @@
+<!-- popularityList.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popularity List</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/styles.css" />
+    <style>
+      h1 {
+        color: #333;
+      }
+
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin: 20px auto;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background-color: #66cdaa;
+        color: white;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+
+      tr:hover {
+        background-color: #ddd;
+      }
+
+      a {
+        color: #66cdaa;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      a:hover {
+        color: #033d26;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="index.html">Home</a>
+      <a href="addBabyName.html">Add New Name</a>
+      <a class="active" href="popularityList.html">Popularity List</a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Popularity</th>
+        </tr>
+      </thead>
+      <tbody id="popularityList"></tbody>
+    </table>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const popularityListContainer =
+          document.getElementById("popularityList");
+
+        async function fetchPopularityList() {
+          const response = await fetch("/getPopularityList");
+          const data = await response.json();
+
+          popularityListContainer.innerHTML = "";
+
+          data.forEach((baby, index) => {
+            const row = document.createElement("tr");
+            row.style.backgroundColor = index % 2 === 0 ? "#f2f2f2" : "#fff";
+
+            const nameCell = document.createElement("td");
+            nameCell.textContent = baby.name;
+
+            const popularityCell = document.createElement("td");
+            popularityCell.textContent = baby.popularity;
+
+            row.appendChild(nameCell);
+            row.appendChild(popularityCell);
+
+            popularityListContainer.appendChild(row);
+          });
+        }
+
+        fetchPopularityList();
+      });
+    </script>
+  </body>
+</html>

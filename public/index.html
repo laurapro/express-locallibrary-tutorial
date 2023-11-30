@@ -1,0 +1,256 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baby Name App</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .button {
+        display: inline-block;
+        border-radius: 8px;
+        background-color: #66cdaa;
+        border: none;
+        color: #ffffff;
+        text-align: center;
+        font-size: 22px;
+        padding: 14px 20px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 20px 10px; /* Increased margin */
+      }
+
+      .button span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+        font-family: "Material Icons"; /* Material Icons font family */
+        margin-left: 5px; /* Adjusted margin for icon spacing */
+      }
+
+      .button span:after {
+        font-family: "Material Icons"; /* Material Icons font family */
+        content: "favorite"; /* Heart icon for like */
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+
+      .button:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+
+      #dislikeButton span:after {
+        content: "thumb_down"; /* Thumbs-down icon for dislike */
+      }
+
+      .image-container {
+        background-image: url("https://images.pexels.com/photos/906150/pexels-photo-906150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
+        background-size: cover;
+        position: relative;
+        height: 300px;
+      }
+
+      .text {
+        background-color: white;
+        color: black;
+        font-size: 10vw;
+        font-weight: bold;
+        margin: 0 auto;
+        padding: 10px;
+        width: 50%;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        mix-blend-mode: screen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav">
+      <a class="active" href="#home">Home</a>
+      <a href="addBabyName.html">Add New Name</a>
+      <a href="popularityList.html">Popularity List</a>
+    </div>
+
+    <!-- Display Baby Name and Buttons -->
+    <div class="image-container">
+      <div class="text" id="babyNameDisplay"></div>
+    </div>
+
+    <button id="likeButton" class="button">
+      Like <span class="material-icons">favorite</span>
+    </button>
+    <button id="dislikeButton" class="button">
+      Dislike <span class="material-icons">thumb_down</span>
+    </button>
+
+    <script type="module" defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        const body = document.body;
+        const babyNameDisplay = document.getElementById("babyNameDisplay");
+        const likeButton = document.getElementById("likeButton");
+        const dislikeButton = document.getElementById("dislikeButton");
+        const imageContainer = document.querySelector(".image-container");
+
+        const Gender = {
+          BOY: "Boy",
+          GIRL: "Girl",
+          NEUTRAL: "Neutral",
+        };
+
+        class BabyName {
+          constructor(name, gender) {
+            this.name = name;
+            this.gender = gender;
+            this.popularity = 0;
+          }
+        }
+
+        let currentBabyName = null;
+        let babyNameList = []; // Cached list
+
+        fetchRandomBabyName().then((initialBabyName) => {
+          currentBabyName = initialBabyName;
+          updateDisplay(initialBabyName);
+        });
+
+        // Function to fetch the list of baby names
+        async function fetchBabyNameList() {
+          const response = await fetch("/getList");
+          const data = await response.json();
+          // Extract only the "name" properties from the response
+          babyNameList = data.map((baby) => baby.name);
+        }
+
+        // Fetch the list of baby names once
+        fetchBabyNameList();
+
+        async function fetchRandomBabyName() {
+          // Check if the list is already fetched
+          if (babyNameList.length === 0) {
+            const response = await fetch("/getList");
+            babyNameList = await response.json();
+          }
+
+          // Check if there are names in the list
+          if (babyNameList.length > 0) {
+            // Select a random index
+            const randomIndex = Math.floor(Math.random() * babyNameList.length);
+            // Return an object with the selected baby name
+            return {
+              name: babyNameList[randomIndex].name,
+              gender: babyNameList[randomIndex].gender,
+            };
+          } else {
+            // If the list is empty, return null
+            return null;
+          }
+        }
+
+        // Function to update the baby name display
+        function updateBabyNameDisplay() {
+          fetchRandomBabyName().then((babyName) => {
+            currentBabyName = babyName;
+            babyNameDisplay.textContent = babyName.name;
+
+            // Set background color based on gender
+            body.style.backgroundColor = getBackgroundColor(babyName.gender);
+            // Set image URL based on gender
+            imageContainer.style.backgroundImage = `url(${getImageUrl(
+              babyName.gender
+            )})`;
+          });
+        }
+
+        // Function to determine background color based on gender
+        function getBackgroundColor(gender) {
+          switch (gender) {
+            case Gender.GIRL:
+              return "lightpink";
+            case Gender.BOY:
+              return "lightblue";
+            case Gender.NEUTRAL:
+              return "lightyellow";
+            default:
+              return "white"; // Default color
+          }
+        }
+
+        // Function to determine image URL based on gender
+        function getImageUrl(gender) {
+          switch (gender) {
+            case Gender.GIRL:
+              return "https://images.pexels.com/photos/906150/pexels-photo-906150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
+            case Gender.BOY:
+              return "https://images.pexels.com/photos/248704/pexels-photo-248704.jpeg?auto=compress&cs=tinysrgb&w=800";
+            case Gender.NEUTRAL:
+              return "https://images.pexels.com/photos/212324/pexels-photo-212324.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
+            default:
+              return "https://images.pexels.com/photos/212324/pexels-photo-212324.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2g";
+          }
+        }
+
+        // Function to handle liking a baby name
+        function likeBabyName() {
+          if (currentBabyName) {
+            // Make a request to update popularity (increase by 1)
+            updatePopularity(currentBabyName.name, 1);
+            // Fetch and display a new random baby name
+            updateBabyNameDisplay();
+          }
+        }
+
+        // Function to handle disliking a baby name
+        function dislikeBabyName() {
+          if (currentBabyName) {
+            // Make a request to update popularity (decrease by 1)
+            updatePopularity(currentBabyName.name, -1);
+            // Fetch and display a new random baby name
+            updateBabyNameDisplay();
+          }
+        }
+
+        // Attach event listeners to buttons
+        likeButton.addEventListener("click", likeBabyName);
+        dislikeButton.addEventListener("click", dislikeBabyName);
+
+        // Initial display of a random baby name
+        updateBabyNameDisplay();
+      });
+
+      // Function to update the popularity of a baby name
+      async function updatePopularity(name, increment) {
+        try {
+          await fetch("/babyNames/updatePopularity", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, increment }),
+          });
+        } catch (error) {
+          console.error("Error updating popularity:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
